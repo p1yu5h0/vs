@@ -21,5 +21,6 @@ app.listen(PORT, async () => {
     res.send(`request received at ${new Date()}`);
   });
 
+  console.log(new Date());
   console.log("application started", new Date().toTimeString());
 });

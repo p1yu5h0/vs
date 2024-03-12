@@ -17,7 +17,7 @@ const updateSchema = async (db) => {
         "fileName",
         "originalName",
         "visibility",
-        "recordingDate",
+        // "recordingDate",
         "videoLink",
       ],
       properties: {
@@ -38,10 +38,10 @@ const updateSchema = async (db) => {
           enum: VIDEO_VISIBILITIES,
           description: "can only be one of the enum values and is required",
         },
-        playlistId: {
-          bsonType: "objectId",
-          description: "must be an objectId and is required",
-        },
+        // playlistId: {
+        //   bsonType: "objectId",
+        //   description: "must be an objectId and is required",
+        // },
         tags: {
           bsonType: "array",
           description: "must be an array and is required",
@@ -53,10 +53,10 @@ const updateSchema = async (db) => {
           bsonType: "string",
           description: "must be a string and is required",
         },
-        recordingDate: {
-          bsonType: "date",
-          description: "must be a date and is required",
-        },
+        // recordingDate: {
+        //   bsonType: "date",
+        //   description: "must be a date and is required",
+        // },
         category: {
           bsonType: "string",
           description: "must be a string and is required",
@@ -123,10 +123,10 @@ const updateSchema = async (db) => {
         key: { playlistId: -1 },
         name: "custom_playlistId_index",
       },
-      {
-        key: { recordingDate: -1 },
-        name: "custom_recordingDate_index",
-      },
+      // {
+      //   key: { recordingDate: -1 },
+      //   name: "custom_recordingDate_index",
+      // },
     ],
   });
 };

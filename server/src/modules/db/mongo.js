@@ -2,10 +2,8 @@ const { MongoClient } = require("mongodb");
 
 let db = null;
 
-const connect = async () => {
-  const client = new MongoClient("mongodb://localhost:27017", {
-    useNewUrlParser: true,
-  });
+const connect = async (database) => {
+  const client = new MongoClient(database);
   console.log('connecting with the db');
   await client.connect();
   db = client.db('videodb');

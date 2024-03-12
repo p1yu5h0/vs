@@ -16,10 +16,10 @@ const search = async (searchObject) => {
 
 const getById = async (id) => {
   try {
-    const Video = await Video.findOne({
+    const v = await Video.findOne({
       _id: id,
     });
-    return Video;
+    return v;
   } catch (err) {
     return err;
   }

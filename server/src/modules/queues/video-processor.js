@@ -1,12 +1,10 @@
 const ffmpeg = require("fluent-ffmpeg");
 const path = require("path");
 const fs = require('fs')
-// const { promisify } = require('util');
-// const { exec } = require('child_process');
+const { QUEUE_EVENTS } = require("./constants");
+const { addQueueItem } = require("./queue");
 
-// const execAsync = promisify(exec);
-
-const execute = async (filePath, outputFolder) => {
+const execute = async (filePath, outputFolder, jobData) => {
   const fileName = path.basename(filePath);
   const extension = path.extname(filePath);
   const fileNameWithoutExt = path.basename(filePath, extension);
@@ -33,6 +31,7 @@ const execute = async (filePath, outputFolder) => {
       })
       .on("end", function () {
         console.log(`Finished processing ${resolution}`);
+        addQueueItem(QUEUE_EVENTS.VIDEO_PROCESSED, { ...jobData });
       })
       .on("error", function (err) {
         console.log(`An error occurred for ${resolution}: ${err.message}`);

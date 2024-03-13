@@ -8,13 +8,17 @@ const QUEUE_EVENTS = {
   VIDEO_WATERMARKED: "video.watermarked",
 };
 
+const { execute } = require("./video-processor");
+
 const uploadedHandler = async (job) => {
   console.log("i am the uploaded handler!", job.data.title);
   return { ...job.data, completed: true, next: QUEUE_EVENTS.VIDEO_PROCESSING };
 };
 
 const processingHandler = async (job) => {
-  console.log("i am the processing handler!", job.data.title);
+  console.log("i am the processing handler!", job.data.path);
+  const processed = await execute(`./${job.data.path}`, `./uploads/processed`);
+  console.log("processed", processed);
   return { ...job.data, completed: true, next: QUEUE_EVENTS.VIDEO_PROCESSED };
 };
 
@@ -67,7 +71,7 @@ const QUEUE_EVENT_HANDLERS = {
   [QUEUE_EVENTS.VIDEO_WATERMARKED]: watermarkedHandler,
 };
 
-module.exports = { 
-    QUEUE_EVENTS, 
-    QUEUE_EVENT_HANDLERS 
+module.exports = {
+  QUEUE_EVENTS,
+  QUEUE_EVENT_HANDLERS,
 };

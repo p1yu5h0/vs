@@ -1,8 +1,11 @@
-const multer = require('multer');
+const multer = require("multer");
 const { insert, search, getById, update, deleteById } = require("./service");
 const { validate } = require("./request");
-const { name } = require("./model");
+const { name, Video } = require("./model");
+const { getDb } = require("../../db/mongo");
 
+
+const db = getDb();
 
 const BASE_URL = `/api/${name}`;
 
@@ -16,12 +19,16 @@ const routes = (app) => {
   });
 
   const storage = multer.diskStorage({
+    ///my change
+    title: function (req, file, cb) {
+      cb(null, "this isssssss");
+    },
     destination: function (req, file, cb) {
       cb(null, "uploads/videos");
     },
     filename: function (req, file, cb) {
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      cb(null, file.fieldname + "-" + uniqueSuffix);
+      const uniqueSuffix = Math.round(Math.random());
+      cb(null, file.fieldname + "-" + uniqueSuffix + ".mp4");
     },
   });
 
@@ -60,6 +67,7 @@ const routes = (app) => {
       const payload = { ...req.body };
       console.log("user given metadata", "title", payload.title);
       res.send(req.file);
+      // res.send(payload.title)
       return;
     } catch (error) {
       console.error(error);
@@ -67,6 +75,62 @@ const routes = (app) => {
     }
   });
 
+  app.post(`${BASE_URL}/create`, async (req, res) => {
+    console.log("POST create", req.body);
+    const validationResult = validate(req.body);
+    console.log(req.body);
+    if (!validationResult.error) {
+      try {
+        const result = await insert(req.body);
+        if (result instanceof Error) {
+          res.status(400).json(JSON.parse(result.message));
+          return;
+        }
+        return res.json(result);
+      } catch (e) {
+        return res.status(502).json(e);
+      }
+    }
+    return res
+      .status(400)
+      .json({ status: "error", message: validationResult.error });
+  });
+
+  app.get(`${BASE_URL}/getvideo`, async (req, res) => {
+    // console.log(" getvideo work ")
+    const a= await Video.find().toArray();
+let b= __dirname;
+
+    console.log(a,b)
+      return res.json(a);
+      
+      fs.readFile('demo.txt', (err, data) => {
+        console.log(data);
+     })
+   
+
+   
+  });
+
+
+  // app.get('/video', (req, res) => {
+  //   const videoPath = '';
+  //   const videoSize = fs.statSync(videoPath).size;
+  
+  //   // Set the Content-Type header
+  //   res.setHeader('Content-Type', 'video/mp4');
+  //   // Set the Content-Length header
+  //   res.setHeader('Content-Length', videoSize);
+  //   // Set the Accept-Ranges header
+  //   res.setHeader('Accept-Ranges', 'bytes');
+  
+  //   // Create a readable stream for the video file
+  //   const videoStream = fs.createReadStream(videoPath);
+  
+  //   // Pipe the video stream to the response object
+  //   videoStream.pipe(res);
+  // });
+ 
   app.use(() => (err, req, res, next) => {
     console.log("error handler", err);
     if (err instanceof multer.MulterError) {
@@ -77,5 +141,5 @@ const routes = (app) => {
 };
 
 module.exports = {
-    routes
-}
+  routes,
+};

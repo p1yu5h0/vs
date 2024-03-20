@@ -15,9 +15,9 @@ const updateSchema = async (db) => {
       required: [
         "title",
         "fileName",
-        "originalName",
-        "visibility",
-        "recordingDate",
+        // "originalName",
+        // "visibility",
+        // "recordingDate",
         "videoLink",
       ],
       properties: {

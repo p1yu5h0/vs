@@ -13,4 +13,4 @@ class EventManager {
     }
 }
 
-module.exports = new EventEmitter();
+module.exports = new EventManager();

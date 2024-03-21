@@ -1,7 +1,7 @@
 const ffmpeg = require("fluent-ffmpeg");
 const path = require("path");
 const fs = require('fs')
-const { QUEUE_EVENTS } = require("./constants");
+const { VIDEO_QUEUE_EVENTS: QUEUE_EVENTS } = require("./constants");
 const { addQueueItem } = require("./queue");
 
 const executeToMp4 = async (filePath, outputFolder, jobData) => {
@@ -27,13 +27,14 @@ const executeToMp4 = async (filePath, outputFolder, jobData) => {
         console.log(`Spawned Ffmpeg with command for ${resolution}: ${commandLine}`);
       })
       .on("progress", function (progress) {
-        if (parseInt(progress.percent) % 20 === 0) {
+        if (parseInt(progress.percent) % 10 === 0) {
           console.log("Processing: " + progress.percent + "% done");
         }
       })
       .on("end", function () {
         console.log(`Finished processing ${resolution, outputFileName}`);
-        addQueueItem(QUEUE_EVENTS.VIDEO_PROCESSED, { ...jobData });
+        addQueueItem(QUEUE_EVENTS.VIDEO_PROCESSED, { ...jobData, completed: true,
+          path: outputFileName, });
       })
       .on("error", function (err) {
         console.log(`An error occurred for ${resolution}: ${err.message}`);
@@ -43,7 +44,7 @@ const executeToMp4 = async (filePath, outputFolder, jobData) => {
     outputFiles.push(outputFileName);
   }
 
-  return { fileName, outputFiles };
+  return;
 };
 
 const executeMp4ToHls = async (filePath, outputFolder, jobData) => {
@@ -69,13 +70,14 @@ const executeMp4ToHls = async (filePath, outputFolder, jobData) => {
         console.log(`Spawned Ffmpeg with command for ${resolution}: ${commandLine}`);
       })
       .on("progress", function (progress) {
-        if (parseInt(progress.percent) % 20 === 0) {
+        if (parseInt(progress.percent) % 10 === 0) {
           console.log("Processing: " + progress.percent + "% done");
         }
       })
       .on("end", function () {
         console.log(`Finished processing ${resolution, outputFileName}`);
-        addQueueItem(QUEUE_EVENTS.VIDEO_PROCESSED, { ...jobData });
+        addQueueItem(QUEUE_EVENTS.VIDEO_PROCESSED, { ...jobData, completed: true,
+          path: outputFileName, });
       })
       .on("error", function (err) {
         console.log(`An error occurred for ${resolution}: ${err.message}`);
@@ -85,7 +87,7 @@ const executeMp4ToHls = async (filePath, outputFolder, jobData) => {
     outputFiles.push(outputFileName);
   }
 
-  return { fileName, outputFiles };
+  return;
 };
 
 module.exports = {

@@ -1,5 +1,5 @@
 const { QUEUE_EVENTS } = require("./constants");
-const { execute } = require("./video-processor");
+const { executeToMp4, executeMp4ToHls } = require("./video-processor");
 
 const { addQueueItem } = require("./queue");
 
@@ -14,7 +14,7 @@ const uploadedHandler = async (job) => {
 
 const processingHandler = async (job) => {
   console.log("i am the processing handler!", job.data.path);
-  const processed = await execute(`./${job.data.path}`, `./uploads/processed`, {
+  const processed = await executeToMp4(`./${job.data.path}`, `./uploads/processed/mp4`, {
     ...job.data,
     completed: true,
     next: QUEUE_EVENTS.VIDEO_PROCESSED,

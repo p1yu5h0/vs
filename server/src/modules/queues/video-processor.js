@@ -4,7 +4,7 @@ const fs = require('fs')
 const { QUEUE_EVENTS } = require("./constants");
 const { addQueueItem } = require("./queue");
 
-const execute = async (filePath, outputFolder, jobData) => {
+const executeToMp4 = async (filePath, outputFolder, jobData) => {
   const fileName = path.basename(filePath);
   const extension = path.extname(filePath);
   const fileNameWithoutExt = path.basename(filePath, extension);
@@ -18,7 +18,7 @@ const execute = async (filePath, outputFolder, jobData) => {
       fs.mkdirSync(subFolder);
     }
 
-    const outputFileName = `${subFolder}/${resolution}.mp4`;
+    const outputFileName = `${subFolder}/mp4-${resolution}.mp4`;
 
     const command = ffmpeg(filePath)
       .output(outputFileName)
@@ -27,10 +27,54 @@ const execute = async (filePath, outputFolder, jobData) => {
         console.log(`Spawned Ffmpeg with command for ${resolution}: ${commandLine}`);
       })
       .on("progress", function (progress) {
-        console.log(`Processing ${resolution}: ${progress.percent}% done`);
+        if (parseInt(progress.percent) % 20 === 0) {
+          console.log("Processing: " + progress.percent + "% done");
+        }
       })
       .on("end", function () {
-        console.log(`Finished processing ${resolution}`);
+        console.log(`Finished processing ${resolution, outputFileName}`);
+        addQueueItem(QUEUE_EVENTS.VIDEO_PROCESSED, { ...jobData });
+      })
+      .on("error", function (err) {
+        console.log(`An error occurred for ${resolution}: ${err.message}`);
+      })
+      .run();
+
+    outputFiles.push(outputFileName);
+  }
+
+  return { fileName, outputFiles };
+};
+
+const executeMp4ToHls = async (filePath, outputFolder, jobData) => {
+  const fileName = path.basename(filePath);
+  const extension = path.extname(filePath);
+  const fileNameWithoutExt = path.basename(filePath, extension);
+
+  const resolutions = ['1280x720', '854x480', '480x360'];
+  const outputFiles = [];
+
+  for (const resolution of resolutions) {
+    const subFolder = `${outputFolder}/${fileNameWithoutExt}`;
+    if (!fs.existsSync(subFolder)) {
+      fs.mkdirSync(subFolder);
+    }
+
+    const outputFileName = `${subFolder}/hls-${resolution}.m3u8`;
+
+    const command = ffmpeg(filePath)
+      .output(outputFileName)
+      .size(resolution)
+      .on("start", function (commandLine) {
+        console.log(`Spawned Ffmpeg with command for ${resolution}: ${commandLine}`);
+      })
+      .on("progress", function (progress) {
+        if (parseInt(progress.percent) % 20 === 0) {
+          console.log("Processing: " + progress.percent + "% done");
+        }
+      })
+      .on("end", function () {
+        console.log(`Finished processing ${resolution, outputFileName}`);
         addQueueItem(QUEUE_EVENTS.VIDEO_PROCESSED, { ...jobData });
       })
       .on("error", function (err) {
@@ -45,5 +89,5 @@ const execute = async (filePath, outputFolder, jobData) => {
 };
 
 module.exports = {
-  execute,
+  executeToMp4, executeMp4ToHls
 };

@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./src/server.js",
-    "queue": "nodemon ./src/queue.js",
-    "all": "concurrently \"nodemon ./src/server.js\" \"nodemon ./src/queue.js\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "web-server": "nodemon ./src/server.js",
+    "video-processor": "nodemon ./src/queue.js",
+    "video-server": "nodemon ./src/video-server.js",
+    "db": "docker-compose up -d",
+    "server": "concurrently \"npm run web-server\" \"npm run video-processor\" \"npm run video-server\"",
+    "start": "npm run db && npm run server"
   },
   "keywords": [],
   "author": "",

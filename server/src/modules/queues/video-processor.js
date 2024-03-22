@@ -1,24 +1,12 @@
 const ffmpeg = require("fluent-ffmpeg");
 const ffmpegInstaller = require("@ffmpeg-installer/ffmpeg");
 const path = require("path");
-const fs = require('fs')
+const fs = require("fs");
 const { VIDEO_QUEUE_EVENTS: QUEUE_EVENTS } = require("./constants");
 const { addQueueItem } = require("./queue");
 
-const AWS = require('aws-sdk');
+const AWS = require("aws-sdk");
 const s3 = new AWS.S3();
-
-const uploadToS3 = async (filePath, outputFileName) => {
-  const fileContent = fs.readFileSync(filePath);
-
-  const params = {
-    Bucket: 'video-piyush-s3',
-    Key: outputFileName,
-    Body: fileContent
-  };
-
-  return s3.upload(params).promise();
-};
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 console.log(ffmpegInstaller.path, ffmpegInstaller.version);
@@ -29,32 +17,23 @@ const executeToMp4 = async (filePath, outputFolder, jobData) => {
 
   const outputFileName = `${outputFolder}/${fileNameWithoutExt}.mp4`;
 
-  ffmpeg(filePath)
-    .output(outputFileName)
-    .on("start", function (commandLine) {
-      console.log("Spawned Ffmpeg with command: " + commandLine);
-    })
-    .on("progress", function (progress) {
-      if (parseInt(progress.percent) % 20 === 0) {
-        console.log("Processing: " + progress.percent + "% done");
-      }
-    })
-    .on("end", async function () {
-      console.log("Finished processing", outputFileName);
-      await addQueueItem(QUEUE_EVENTS.VIDEO_PROCESSED, {
-        ...jobData,
-        completed: true,
-        path: outputFileName,
-      });
-    })
-    .on("error", function (err) {
-      console.log("An error occurred: " + err.message);
-    })
-    .run();
+  const uploadParams = {
+    Bucket: "video-piyush-s3",
+    Key: outputFileName,
+    Body: ffmpeg(filePath).format("mp4").pipe(),
+  };
 
-    await uploadToS3(outputFileName, `${outputFolder}/${fileNameWithoutExt}.mp4`);
-
-  return;
+  try {
+    await s3.upload(uploadParams).promise();
+    console.log("File uploaded successfully to S3:", outputFileName);
+    await addQueueItem(QUEUE_EVENTS.VIDEO_PROCESSED, {
+      ...jobData,
+      completed: true,
+      path: outputFileName,
+    });
+  } catch (error) {
+    console.error("Error uploading file to S3:", error);
+  }
 };
 
 const executeMp4ToHls = async (filePath, outputFolder, jobData) => {
@@ -63,38 +42,25 @@ const executeMp4ToHls = async (filePath, outputFolder, jobData) => {
 
   const outputFileName = `${outputFolder}/${fileNameWithoutExt}.m3u8`;
 
-  ffmpeg(filePath)
-    .output(outputFileName)
-    .outputOptions([
-      "-hls_time 10",
-      "-hls_list_size 0",
-      "-hls_flags delete_segments",
-      "-hls_segment_filename",
-      `${outputFolder}/${fileNameWithoutExt}_%03d.ts`,
-    ])
-    .on("start", function (commandLine) {
-      console.log("Spawned Ffmpeg with command: " + commandLine);
-    })
-    .on("progress", function (progress) {
-      if (parseInt(progress.percent) % 20 === 0) {
-        console.log("Processing: " + progress.percent + "% done");
-      }
-    })
-    .on("end", function () {
-      console.log("Finished processing", outputFileName);
-      addQueueItem(QUEUE_EVENTS.VIDEO_HLS_CONVERTED, {
-        ...jobData,
-        path: outputFileName,
-      });
-    })
-    .on("error", function (err) {
-      console.log("An error occurred: " + err.message);
-    })
-    .run();
-    await uploadToS3(outputFileName, `${outputFolder}/${fileNameWithoutExt}.m3u8`);
-  return;
+  const uploadParams = {
+    Bucket: "video-piyush-s3",
+    Key: outputFileName,
+    Body: ffmpeg(filePath).format("hls").pipe(),
+  };
+
+  try {
+    await s3.upload(uploadParams).promise();
+    console.log("File uploaded successfully to S3:", outputFileName);
+    await addQueueItem(QUEUE_EVENTS.VIDEO_HLS_CONVERTED, {
+      ...jobData,
+      path: outputFileName,
+    });
+  } catch (error) {
+    console.error("Error uploading file to S3:", error);
+  }
 };
 
 module.exports = {
-  executeToMp4, executeMp4ToHls
+  executeToMp4,
+  executeMp4ToHls,
 };

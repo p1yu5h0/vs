@@ -9,7 +9,8 @@
     "video-server": "nodemon ./src/video-server.js",
     "db": "docker-compose up -d",
     "server": "concurrently \"npm run web-server\" \"npm run video-processor\" \"npm run video-server\"",
-    "start": "npm run db && npm run server"
+    "start": "npm run db && npm run server",
+    "start-ec2": "sudo docker-compose up -d && npm run server"
   },
   "keywords": [],
   "author": "",

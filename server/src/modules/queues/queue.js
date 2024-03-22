@@ -1,7 +1,7 @@
 const { Queue } = require("bullmq");
 
 // const queueName = "video";
-const { QUEUE_EVENTS } = require("./constants");
+const { ALL_EVENTS: QUEUE_EVENTS } = require("./constants");
 
 const reddisConnection = {
   host: "localhost",

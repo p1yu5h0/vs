@@ -4,17 +4,9 @@
 # MERN Video Streaming Project
 
 ## Overview
-MERN Video Streaming is a cutting-edge, open-source platform for video
-streaming, offering a comprehensive, full-stack solution utilizing the latest
-MERN stack technologies. With MERN Video Streaming, users can easily upload,
-manage, and stream videos on demand, providing a seamless experience. This
-project features a video processing capability that provides real-time
-notifications upon completion.
+A state-of-the-art, open-source video streaming platform, MERN Video Streaming provides a full-stack, comprehensive solution that makes use of the newest MERN stack technologies. Users can effortlessly upload, organize, and stream videos on demand with MERN Video Streaming, offering a smooth experience. This project has the capacity to process videos and send out notifications in real time when it is finished. 
 
-The backend is comprised of three services, utilizing Redis messaging for
-communication. These include an API server, a video conversion service, and an
-HTTP server serving HLS video files. On the client side, the project uses
-create-react-app and MUI library, along with socket.io-client and React Context.
+The backend consists of three services that communicate with each other via Redis messaging. These consist of an HTTP server that serves HLS video files, an API server, and a video conversion service. The project's client employs the create-react-app and MUI libraries, as well as socket.io-client and React Context.
 
 ## Architecture
 
@@ -22,17 +14,11 @@ create-react-app and MUI library, along with socket.io-client and React Context.
 
 #### API Server
 
-The API server is an Expressjs app that uses Joi, Multer, BullMQ, Socket.io, and
-MongoDB driver. The server communicates with Redis to process and store data,
-and uses MongoDB as the primary database. The database and Redis are spun up via
-the docker-compose command.
+An Expressjs application called the API server makes use of the Joi, Multer, BullMQ, Socket.io, and MongoDB drivers. The primary database on the server is MongoDB, which is used in conjunction with Redis for data processing and storage. The docker-compose command spins up the database and Redis.
 
 #### Video Conversion Service
 
-The video conversion service is a node process that is responsible for
-converting videos and communicating with Redis via the BullMQ library. The
-service is not exposed to any HTTP port.
-
+The video conversion service is a node process that uses the BullMQ library to communicate with Redis and convert videos. There are no HTTP ports open to the service.
 #### HTTP Server
 
 The HTTP server is a plain and simple server that serves HLS video files.

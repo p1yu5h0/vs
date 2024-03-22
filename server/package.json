@@ -16,7 +16,9 @@
   "license": "ISC",
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@types/mongodb": "^4.0.7",
+    "aws-sdk": "^2.1583.0",
     "bcrypt": "^5.1.1",
     "bson": "^6.4.0",
     "bullmq": "^5.4.2",

@@ -14,10 +14,10 @@ const setup = async (db) => {
   const { listenQueueEvent } = await require("./modules/queues/worker");
   listenQueueEvent(NOTIFY_EVENTS.NOTIFY_VIDEO_HLS_CONVERTED);
 
-  // eventEmitter.on(NOTIFY_EVENTS.NOTIFY_VIDEO_HLS_CONVERTED, (data) => {
-  //   console.log("NOTIFY_EVENTS.NOTIFY_VIDEO_HLS_CONVERTED Event handler", data);
-  //   io.emit("hello", "world", data);
-  // });
+  eventEmitter.on(NOTIFY_EVENTS.NOTIFY_VIDEO_HLS_CONVERTED, (data) => {
+    console.log("NOTIFY_EVENTS.NOTIFY_VIDEO_HLS_CONVERTED Event handler", data);
+    io.emit("hello", "world", data);
+  });
 };
 
 const http = require("http");

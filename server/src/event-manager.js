@@ -1,16 +1,19 @@
-const EventEmitter = require('events');
+const { EventEmitter } = require('events');
 
 class EventManager {
     constructor(){
         if(!EventManager.instance){
-            EventEmitter.instance = new EventEmitter();
+            this.eventEmitter = new EventEmitter();
+            EventManager.instance = this;
         }
     }
 
-     // eslint-disable-next-line class-methods-use-this
-    getInstance() {
-        return EventManager.instance;
+    static getInstance() {
+        if (!EventManager.instance) {
+            EventManager.instance = new EventManager();
+        }
+        return EventManager.instance.eventEmitter;
     }
 }
 
-module.exports = new EventManager();
+module.exports = EventManager;

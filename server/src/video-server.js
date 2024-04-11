@@ -24,7 +24,7 @@ const requestHandler = (req, res) => {
             return;
           }
           res.setHeader("Content-Type", "text/html");
-          const fileList = files.map(file => `<li><a href="${req.url}/${file}">${file}</a></li>`).join('');
+          const fileList = files.map(file => `<li><a href="${file}" target="_blank">${file}</a></li>`).join('');
           res.end(`<h1>Directory Listing:</h1><ul>${fileList}</ul>`);
         });
       } else {

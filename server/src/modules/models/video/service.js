@@ -38,6 +38,22 @@ const update = async (id) => {
   }
 };
 
+const updateHistory = async (id, history) => {
+  try {
+    const updatedDoc = Video.updateOne({
+      _id: id
+    }, {
+      $push : {
+        history
+      }
+    })
+    return updatedDoc
+  } catch (err) {
+    console.log(err);
+    return err;
+  }
+}
+
 const deleteById = async (id) => {
   try {
     const deleted = await Video.deleteOne({
@@ -55,5 +71,6 @@ module.exports = {
     search,
     getById,
     update,
-    deleteById
+    deleteById,
+    updateHistory
 }

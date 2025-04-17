@@ -2,6 +2,7 @@ const { Queue } = require("bullmq");
 
 // const queueName = "video";
 const { ALL_EVENTS: QUEUE_EVENTS } = require("./constants");
+// const { updateHistory } = require("../models/video/service");
 
 const reddisConnection = {
   host: "localhost",
@@ -20,6 +21,10 @@ const addQueueItem = async (queueName, item) => {
   if (!queue) {
     throw new Error(`queue ${queueName} not found`);
   }
+  // await updateHistory(item.id, {
+    // status: queueName,
+    // createdAt: new Date()
+  // })
   await queue.queueObj.add(queueName, item, {
     removeOnComplete: true,
     removeOnFail: false,

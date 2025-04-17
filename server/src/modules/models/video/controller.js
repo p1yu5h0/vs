@@ -118,10 +118,19 @@ const routes = (app) => {
   app.post(`${BASE_URL}/upload`, uploadProcessor, async (req, res) => {
     try {
       console.log("POST upload", JSON.stringify(req.body));
-      const payload = { ...req.body };
-      console.log("user given metadata", "title", payload.title);
+      const dbPayload = { 
+        ...req.body,
+        fileName: req.file.filename,
+        originalName: req.file.originalname,
+        recordingDate: new Date(),
+        videoLink: req.file.path,
+        visibility: "PUBLIC"
+      };
+      const result = await insert(dbPayload);
+      console.log("result", result);
       await addQueueItem(QUEUE_EVENTS.VIDEO_UPLOADED, {
-        ...payload,
+        id: result.insertedId.toString(),
+        ...req.body,
         ...req.file,
       });
       res
